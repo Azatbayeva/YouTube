@@ -1,8 +1,9 @@
 import { Box, Container, Stack, Typography } from '@mui/material'
+import { useEffect, useState } from 'react'
+
 import { colors } from '../../constants/colors'
 import Category from '../category'
 import Videos from '../videos'
-import { useEffect, useState } from 'react'
 import { ApiService } from '../service/api.service'
 
 const Main = () => {
@@ -31,8 +32,12 @@ const Main = () => {
 				selectedCategoryHandler={selectCategoryHandler}
 				selectedCategory={selectedCategory}
 			/>
-			<Box p={2} sx={{ height: '90vh' }}>
-				<Container fixed sx={{ width: '90%'  }}>
+			<Box p={3} sx={{ height: '90vh' }}>
+				<Container
+					maxWidth={false}
+					disableGutters
+					sx={{ width: '90%', mx: 'auto' }}
+				>
 					<Typography variant='h4' fontWeight='bold' mb={2}>
 						{selectedCategory}{' '}
 						<span style={{ color: colors.secondary }}>videos</span>

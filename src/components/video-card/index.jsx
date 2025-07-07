@@ -9,11 +9,17 @@ import {
 import { CheckCircle } from '@mui/icons-material'
 import { colors } from '../../constants/colors'
 import moment from 'moment'
+import { Link } from 'react-router-dom'
 
 const VideoCard = ({ video }) => {
+	const videoId = video?.id?.videoId || video?.id
 	const {
-		snippet: { title, description, thumbnails, channelTitle, publishedAt },
-	} = video
+		title = '',
+		description = '',
+		thumbnails,
+		channelTitle,
+		publishedAt,
+	} = video?.snippet || {}
 
 	return (
 		<Card
@@ -23,14 +29,17 @@ const VideoCard = ({ video }) => {
 				borderRadius: 0,
 			}}
 		>
-			<CardMedia
-				image={thumbnails?.high?.url}
-				alt={title}
-				sx={{
-					width: { xs: '100%', sm: '360px', md: '320px' },
-					height: '180px',
-				}}
-			/>
+			<Link to={`/video/${videoId}`}>
+				<CardMedia
+					image={thumbnails?.high?.url}
+					alt={title}
+					sx={{
+						width: { xs: '100%', sm: '360px', md: '320px' },
+						height: '180px',
+					}}
+				/>
+			</Link>
+
 			<CardContent
 				sx={{
 					background: colors.primary,
@@ -38,17 +47,19 @@ const VideoCard = ({ video }) => {
 					position: 'relative',
 				}}
 			>
-				<Typography my={'5px'} sx={{ opacity: 0.4 }}>
-					{moment(publishedAt).fromNow()}
-				</Typography>
+				<Link to={`/video/${videoId}`} style={{ textDecoration: 'none', color: 'white' }}>
+					<Typography my={'5px'} sx={{ opacity: 0.4 }}>
+						{moment(publishedAt).fromNow()}
+					</Typography>
 
-				<Typography variant='subtitle1' fontWeight='bold'>
-					{title.slice(0, 50)}
-				</Typography>
+					<Typography variant='subtitle1' fontWeight='bold'>
+						{title.slice(0, 50)}
+					</Typography>
 
-				<Typography variant='subtitle2' sx={{ opacity: 0.6 }}>
-					{description.slice(0, 70)}
-				</Typography>
+					<Typography variant='subtitle2' sx={{ opacity: 0.6 }}>
+						{description.slice(0, 70)}
+					</Typography>
+				</Link>
 
 				<Stack
 					direction={'row'}
