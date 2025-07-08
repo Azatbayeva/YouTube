@@ -19,6 +19,8 @@ const Search = () => {
 	const { id } = useParams()
 
 	useEffect(() => {
+
+		//working with Api
 		const getData = async () => {
 			try {
 				setLoading(true)

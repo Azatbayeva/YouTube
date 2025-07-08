@@ -48,7 +48,6 @@ const VideoDetail = () => {
 				width={'100%'}
 				justifyContent='center'
 			>
-				{/* Video Section */}
 				<Box width={{ xs: '100%', md: '70%' }} px={2}>
 					<ReactPlayer
 						src={`https://www.youtube.com/watch?v=${id}`}
