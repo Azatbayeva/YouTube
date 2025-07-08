@@ -1,21 +1,34 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { ApiService } from '../service/api.service'
 import { Box, Chip, Stack, Avatar, Typography } from '@mui/material'
-import { Tag, Visibility, FavoriteOutlined, MarkChatRead, CheckCircle } from '@mui/icons-material'
+import {
+	Tag,
+	Visibility,
+	FavoriteOutlined,
+	MarkChatRead,
+	CheckCircle,
+} from '@mui/icons-material'
 import ReactPlayer from 'react-player'
+import Videos from '../videos' // related videos component
 
 const VideoDetail = () => {
 	const [videoDetail, setVideoDetail] = useState(null)
+	const [relatedVideo, setRelatVideo] = useState([])
 	const { id } = useParams()
 
 	useEffect(() => {
 		const getData = async () => {
 			try {
 				const data = await ApiService.fetching(
-					`videos?part=contentDetails%2Csnippet%2Cstatistics&id=${id}`
+					`videos?part=contentDetails,snippet,statistics&id=${id}`
 				)
 				setVideoDetail(data.items[0])
+
+				const relatedData = await ApiService.fetching(
+					`search?relatedToVideoId=${id}&part=snippet&type=video&maxResults=50`
+				)
+				setRelatVideo(relatedData.items)
 			} catch (error) {
 				console.error('Error fetching video data:', error)
 			}
@@ -30,21 +43,22 @@ const VideoDetail = () => {
 
 	return (
 		<Box minHeight='90vh' mb={10}>
-			<Box
-				display={'flex'}
-				sx={{ flexDirection: { xs: 'column', md: 'row' } }}
-				width={{ xs: '100%', md: '75%' }}
+			<Stack
+				direction={{ xs: 'column', md: 'row' }}
+				width={'100%'}
+				justifyContent='center'
 			>
-				<Box width={{ xs: '100%', md: '75%' }}>
+				{/* Video Section */}
+				<Box width={{ xs: '100%', md: '70%' }} px={2}>
 					<ReactPlayer
-						url={`https://www.youtube.com/watch?v=${id}`}
+						src={`https://www.youtube.com/watch?v=${id}`}
 						className='react-player'
 						width='100%'
 						height='400px'
 						controls
 					/>
 
-					{/* Video Tags */}
+					{/* Tags */}
 					<Box mt={2}>
 						{snippet?.tags?.slice(0, 5).map((item, idx) => (
 							<Chip
@@ -58,12 +72,12 @@ const VideoDetail = () => {
 						))}
 					</Box>
 
-					{/* Video Title */}
+					{/* Title */}
 					<Typography variant='h5' fontWeight='bold' p={2}>
 						{snippet.title}
 					</Typography>
 
-					{/* Video Description */}
+					{/* Description */}
 					<Typography
 						variant='subtitle2'
 						p={2}
@@ -76,43 +90,65 @@ const VideoDetail = () => {
 
 					{/* Stats */}
 					<Stack direction='row' alignItems='center' py={1} px={2} gap={4}>
-						<Stack direction='row' alignItems='center' gap='5px' sx={{ opacity: 0.7 }}>
+						<Stack
+							direction='row'
+							alignItems='center'
+							gap='5px'
+							sx={{ opacity: 0.7 }}
+						>
 							<Visibility />
 							{parseInt(statistics.viewCount).toLocaleString()} views
 						</Stack>
-						<Stack direction='row' alignItems='center' gap='5px' sx={{ opacity: 0.7 }}>
+						<Stack
+							direction='row'
+							alignItems='center'
+							gap='5px'
+							sx={{ opacity: 0.7 }}
+						>
 							<FavoriteOutlined />
 							{parseInt(statistics.likeCount).toLocaleString()} likes
 						</Stack>
-						<Stack direction='row' alignItems='center' gap='5px' sx={{ opacity: 0.7 }}>
+						<Stack
+							direction='row'
+							alignItems='center'
+							gap='5px'
+							sx={{ opacity: 0.7 }}
+						>
 							<MarkChatRead />
 							{parseInt(statistics.commentCount).toLocaleString()} comments
 						</Stack>
 					</Stack>
+
+					{/* Channel Info */}
+					<Link to={`/channel/${snippet?.channelId}`}>
+						<Stack direction='row' alignItems='center' p={2} gap={2}>
+							<Avatar
+								alt={snippet.channelTitle}
+								src={snippet.thumbnails?.default?.url}
+							/>
+							<Typography variant='subtitle2' color='gray'>
+								{snippet.channelTitle}
+								<CheckCircle
+									sx={{ fontSize: '12px', color: 'gray', ml: '5px' }}
+								/>
+							</Typography>
+						</Stack>
+					</Link>
 				</Box>
 
-				{/* Channel Info */}
-				<Box width={{ xs: '100%', md: '25%' }} mt={2} pl={2}>
-					<Stack direction='row' alignItems='center' gap='10px'>
-						<Avatar
-							alt={snippet.channelTitle}
-							src={snippet.thumbnails?.default?.url}
-						/>
-						<Typography variant='subtitle2' color='gray'>
-							{snippet.channelTitle}
-							<CheckCircle sx={{ fontSize: '12px', color: 'gray', ml: '5px' }} />
-						</Typography>
-					</Stack>
+				{/* Suggested Videos Section */}
+				<Box
+					width={{ xs: '100%', md: '30%' }}
+					px={2}
+					py={2}
+					sx={{ maxHeight: '85vh', overflowY: 'auto' }}
+				>
+					<Typography variant='h6' mb={2}>
+						Related Videos
+					</Typography>
+					<Videos videos={relatedVideo} />
 				</Box>
-			</Box>
-
-			{/* Suggested Videos */}
-			<Box width={'100%'} mt={4} px={2}>
-				<Typography variant='h6' fontWeight='bold'>
-					Suggested Videos
-				</Typography>
-				{/* You can map suggested videos here */}
-			</Box>
+			</Stack>
 		</Box>
 	)
 }

@@ -24,7 +24,7 @@ const Main = () => {
 		}
 
 		getData()
-	}, [selectedCategory]) // <-- Kiritilgan o‘zgarish
+	}, [selectedCategory]) 
 
 	return (
 		<Stack>
